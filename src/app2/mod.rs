@@ -20,7 +20,7 @@ const PAYLOAD_LIMIT: u64 = 1024 * 16;
 pub struct BookPayload {
     pub title: Option<String>,
     pub author: Option<String>,
-    pub year: Option<i32>,    
+    pub year: Option<i32>,
     pub reference: Option<String>,
     pub score: Option<f32>,
 }
@@ -156,7 +156,7 @@ fn book_payload_to_book(book_payload: &BookPayload)
     Book {
         title: book_payload.title.clone(),
         author: book_payload.author.clone(),
-        year: book_payload.year,        
+        year: book_payload.year,
         scores,
         last_modified: None,
     }
@@ -197,7 +197,7 @@ fn book_to_book_payload(optional_book: &Option<Book>)
             BookPayload {
                 title: book.title.clone(),
                 author: book.author.clone(),
-                year: book.year,                
+                year: book.year,
                 reference: note,
                 score: avg_score,
             }
@@ -205,7 +205,7 @@ fn book_to_book_payload(optional_book: &Option<Book>)
         None => BookPayload {
             title: None,
             author: None,
-            year: None,            
+            year: None,
             reference: None,
             score: None,
         },

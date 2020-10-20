@@ -21,7 +21,7 @@ pub struct Book {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub year: Option<i32>,    
+    pub year: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scores: Option<Vec<Score>>,
     #[serde(skip_serializing_if = "Option::is_none")]
