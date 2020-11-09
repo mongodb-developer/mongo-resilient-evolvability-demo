@@ -1,6 +1,6 @@
-# mongo-robust-fluidity-demo
+# mongo-resilient-evolvability-demo
 
-A project to demonstrate some of the best practices for building resilient yet evolvable data-driven applications using a flexible data model based database like MongoDB, leveraging some of the Robust Fluidity Principles. 
+A project to demonstrate some of the best practices for building resilient yet evolvable shared data applications using a flexible data model based database like MongoDB. 
 
 For this example, uses a library books scenario where _app1_ is a books inventory manager exposed as a REST API and _app2_ is a books ratings/scores manager expsoed as a REST API. For the sake of simiplicitry, both apps are part of the same Rust Cargo project with a shared _main_ boostrap function, but when run each of the two apps listens on a different localhost HTTP port (_8181_ & _8282_ respectively).
 
@@ -23,7 +23,7 @@ _(ensure you have the URL of an __MongoDB database__ accessible, to enable the r
  1. To run the first application, execute the following command (example URL shown assumes you are running a MongoDB single server unauthenticated database on your local machine listening on _localhost:27017_ - change this URL, containing appropriate credentials, to match the location of your remote MongoDB database):
  
 ```console
-cargo run app1 mongodb://localhost:27017
+cargo run app1 mongodb://localcdhost:27017
 ```
 
  2. From a browser test the first application's REST API _Get_ operation:
