@@ -1,6 +1,6 @@
 # mongo-resilient-evolvability-demo
 
-(by Paul Done - [@TheDonester](https://twitter.com/TheDonester)
+*(by Paul Done - [@TheDonester](https://twitter.com/TheDonester))*
 
 A project to demonstrate some of the best practices for building resilient yet evolvable shared data applications using a flexible data model based database like MongoDB. 
 
