@@ -25,7 +25,7 @@ _(ensure you have the URL of an __MongoDB database__ accessible, to enable the r
  1. To run the first application, execute the following command (example URL shown assumes you are running a MongoDB single server unauthenticated database on your local machine listening on _localhost:27017_ - change this URL, containing appropriate credentials, to match the location of your remote MongoDB database):
  
 ```console
-cargo run app1 mongodb://localcdhost:27017
+cargo run app1 mongodb://localhost:27017
 ```
 
  2. From a browser test the first application's REST API _Get_ operation:
