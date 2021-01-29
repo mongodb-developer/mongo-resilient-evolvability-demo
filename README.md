@@ -2,7 +2,7 @@
 
 *(by Paul Done - [@TheDonester](https://twitter.com/TheDonester))*
 
-A project to demonstrate some of the best practices for building resilient yet evolvable shared data applications using a flexible data model based database like MongoDB. 
+A project to demonstrate some of the best practices for building resilient yet evolvable shared data applications using a flexible data model based database like MongoDB. Based on the [The Six Principles for Building Robust Yet Flexible Shared Data Applications](https://developer.mongodb.com/article/six-principles-building-robust-flexible-shared-data-applications).
 
 For this example, uses a library books scenario where _app1_ is a books inventory manager exposed as a REST API and _app2_ is a books ratings/scores manager expsoed as a REST API. For the sake of simiplicitry, both apps are part of the same Rust Cargo project with a shared _main_ boostrap function, but when run each of the two apps listens on a different localhost HTTP port (_8181_ & _8282_ respectively).
 
