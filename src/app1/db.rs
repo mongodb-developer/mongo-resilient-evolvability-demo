@@ -1,5 +1,4 @@
-use bson::{from_document, to_document, DateTime};
-use chrono::offset::Utc;
+use bson::DateTime;
 use futures::prelude::*;
 use mongodb::{
     bson::doc,
@@ -9,10 +8,8 @@ use mongodb::{
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
-
 const DB_NAME: &str = "library";
 const COLL_NAME: &str = "books";
-
 
 // Book record
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -33,13 +30,11 @@ pub struct Book {
     pub last_modified: Option<DateTime>,
 }
 
-
 // Book manager
 #[derive(Debug, Clone)]
 pub struct BooksMgr {
-    coll: Collection,
+    coll: Collection<Book>,
 }
-
 
 // Manages interaction with books database collection
 //
@@ -51,7 +46,6 @@ impl BooksMgr {
         let coll = client.database(DB_NAME).collection(COLL_NAME);
         Ok(Self { coll })
     }
-
 
     // Query books collection returning list of all books & quantities
     //
@@ -79,12 +73,11 @@ impl BooksMgr {
         let mut cursor = self.coll.find(filter_doc, find_options).await?;
 
         while let Some(doc) = cursor.next().await {
-            results.push(from_document(doc?)?);
+            results.push(doc?);
         }
 
         Ok(results)
     }
-
 
     // Insert new book record
     //
@@ -93,13 +86,12 @@ impl BooksMgr {
         err_if_none(&book.author, "author")?;
         err_if_none(&book.year, "year")?;
         err_if_none(&book.quantity, "quantity")?;
-        let now = Some(DateTime(Utc::now()));
+        let now = Some(DateTime::now());
         book.first_created = now;
         book.last_modified = now;
-        self.coll.insert_one(to_document(&book)?, None).await?;
+        self.coll.insert_one(book, None).await?;
         Ok(())
     }
-
 
     // Update existing book record adding new quantity
     //
@@ -110,48 +102,37 @@ impl BooksMgr {
         self.coll
             .update_one(
                 doc! {"title": title, "author": author},
-                doc! {"$inc": {"quantity": quantity}, "$set": {"last_modified": Utc::now()}},
+                doc! {"$inc": {"quantity": quantity}, "$set": {"last_modified": DateTime::now()}},
                 None,
             )
             .await?;
         Ok(())
     }
-
 
     // Delete book record from books collection which matches book title
     //
     pub async fn db_delete_book(&self, book: &Book) -> Result<(), Box<dyn Error>> {
         let title = get_or_err(book.title.as_ref(), "title")?;
         let author = get_or_err(book.author.as_ref(), "author")?;
-        self.coll
-            .delete_one(
-                doc! {"title": title, "author": author},
-                None,
-            )
-            .await?;
+        self.coll.delete_one(doc! {"title": title, "author": author}, None).await?;
         Ok(())
     }
 }
 
-
 // Validate specific variable field has a value, returning an error if no value
 //
-fn err_if_none<T>(field: &Option<T>, fieldname: &str)
-                  -> Result<(), Box<dyn Error>> {
+fn err_if_none<T>(field: &Option<T>, fieldname: &str) -> Result<(), Box<dyn Error>> {
     match field {
         Some(_) => Ok(()),
-        None => Err(format!("Field  `{}` is empty, but is required", fieldname).into()),
+        None => Err(format!("Field `{}` is empty, but is required", fieldname).into()),
     }
 }
-
 
 // Validate specific variable field has a value, returning it, otherwise returning an error
 //
-fn get_or_err<'a, T>(field: Option<&'a T>, fieldname: &str)
-                     -> Result<&'a T, Box<dyn Error>> {
+fn get_or_err<'a, T>(field: Option<&'a T>, fieldname: &str) -> Result<&'a T, Box<dyn Error>> {
     match field {
         Some(val) => Ok(val),
-        None => Err(format!("Field  `{}` is empty, but is required", fieldname).into()),
+        None => Err(format!("Field `{}` is empty, but is required", fieldname).into()),
     }
 }
-

@@ -5,7 +5,7 @@ db.books.createIndex({author: 1, year: -1});
 db.books.createIndex({title: 1});
 db.books.createIndex({year: -1});
 var now = new Date();
-db.books.insert([
+db.books.insertMany([
     {
         'title': 'The Last Man',
         'author': 'Mary Shelley',

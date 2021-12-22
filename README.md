@@ -22,38 +22,50 @@ cargo build
 
 _(ensure you have the URL of an __MongoDB database__ accessible, to enable the reading & writing of records in the database collection __library.books__)_
 
- 1. To run the first application, execute the following command (example URL shown assumes you are running a MongoDB single server unauthenticated database on your local machine listening on _localhost:27017_ - change this URL, containing appropriate credentials, to match the location of your remote MongoDB database):
+ 1. Load the book data into a MongoDB database using the MongoDB Shell (the example command shown assumes the database is listening on _localhost:27017_):
+ 
+```console
+mongosh data/book-data-prep-for-app1.js
+```
+
+ 2. To run the first application, execute the following command (example URL shown assumes you are running a MongoDB single server unauthenticated database on your local machine listening on _localhost:27017_ - change this URL, containing appropriate credentials, to match the location of your remote MongoDB database):
  
 ```console
 cargo run app1 mongodb://localhost:27017
 ```
 
- 2. From a browser test the first application's REST API _Get_ operation:
+ 3. From a browser test the first application's REST API _Get_ operation:
  
  * [http://127.0.0.1:8181/v1/books](http://127.0.0.1:8181/v1/books)
  * [http://127.0.0.1:8181/v1/books?title=The%20Day%20of%20the%20Triffids&author=John%20Wyndham](http://127.0.0.1:8181/v1/books?title=The%20Day%20of%20the%20Triffids&author=John%20Wyndham)
 
 
- 3. From a new terminal, run the first application's test script by executing the following command:
+ 4. From a new terminal, run the first application's test script by executing the following command:
   
 ```console
 tests/test_app1.sh
 ```
+
+ 5. Modify some of the book data to include some review scores in the MongoDB database using the MongoDB Shell (the example command shown assumes the database is listening on _localhost:27017_):
+ 
+```console
+mongosh data/book-data-prep-for-app2.js
+```
   
- 4. To run the second application, keep the existing first application running and in a new terminal execute the following command (change this URL to match the location of your remote MongoDB database):
+ 6. To run the second application, keep the existing first application running and in a new terminal execute the following command (change this URL to match the location of your remote MongoDB database):
  
 ```console
 cargo run app2 mongodb://localhost:27017
 ```
 
- 5. From a browser test the second application's REST API _Get_ operation:
+ 7. From a browser test the second application's REST API _Get_ operation:
  
  * [http://127.0.0.1:8282/v1/books?title=The%20Last%20Man&author=Mary%20Shelley](http://127.0.0.1:8282/v1/books?title=The%20Last%20Man&author=Mary%20Shelley)
  * [http://127.0.0.1:8282/v1/books?title=The%20Day%20of%20the%20Triffids&author=John%20Wyndham](http://127.0.0.1:8282/v1/books?title=The%20Day%20of%20the%20Triffids&author=John%20Wyndham)
 
 
 
- 6. Run the second application's test script by executing the following command:
+ 8. Run the second application's test script by executing the following command:
   
 ```console
 tests/test_app2.sh

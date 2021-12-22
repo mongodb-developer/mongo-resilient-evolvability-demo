@@ -1,5 +1,4 @@
-use bson::{from_document, DateTime};
-use chrono::offset::Utc;
+use bson::DateTime;
 use mongodb::{
     bson::doc,
     options::FindOneOptions,
@@ -8,10 +7,8 @@ use mongodb::{
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
-
 const DB_NAME: &str = "library";
 const COLL_NAME: &str = "books";
-
 
 // Book record
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -28,7 +25,6 @@ pub struct Book {
     pub last_modified: Option<DateTime>,
 }
 
-
 // Score sub-record
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Score {
@@ -38,13 +34,11 @@ pub struct Score {
     pub rating: Option<i32>,
 }
 
-
 // Book scores manager
 #[derive(Debug, Clone)]
 pub struct BookScoresMgr {
-    coll: Collection,
+    coll: Collection<Book>,
 }
-
 
 // Manages interaction with books database collection
 //
@@ -56,7 +50,6 @@ impl BookScoresMgr {
         let coll = client.database(DB_NAME).collection(COLL_NAME);
         Ok(Self { coll })
     }
-
 
     // Query books collection returning list of book scores for a book
     //
@@ -71,12 +64,8 @@ impl BookScoresMgr {
             .projection(doc! {"title": 1, "author": 1, "year": 1, "scores": 1, "last_modified": 1})
             .build();
         let doc = self.coll.find_one(doc! {"title": title, "author": author}, find_options).await?;
-        match doc {
-            Some(document) => Ok(Some(from_document(document)?)),
-            None => Ok(None),
-        }
+        Ok(doc)
     }
-
 
     // Insert new book score
     //
@@ -92,14 +81,13 @@ impl BookScoresMgr {
                 doc! {"title": title, "author": author},
                 doc! {
                     "$push": {"scores": {"reference": reference, "rating": rating}},
-                    "$set": {"last_modified": Utc::now()}
+                    "$set": {"last_modified": DateTime::now()}
                 },
                 None,
             )
             .await?;
         Ok(())
     }
-
 
     // Update existing book record adding new quantity
     //
@@ -108,7 +96,6 @@ impl BookScoresMgr {
         self.db_insert_book_score(book).await?;
         Ok(())
     }
-
 
     // Delete a score from a book's record for the matching reviewer reference
     //
@@ -123,7 +110,7 @@ impl BookScoresMgr {
                     doc! {"title": title, "author": author},
                     doc! {
                         "$pull": {"scores": {"reference": reference}},
-                        "$set": {"last_modified": Utc::now()}
+                        "$set": {"last_modified": DateTime::now()}
                     },
                     None,
                 )
@@ -134,14 +121,11 @@ impl BookScoresMgr {
     }
 }
 
-
 // Validate specific variable field has a value, returning it, otherwise returning an error
 //
-fn get_or_err<'a, T>(field: Option<&'a T>, fieldname: &str)
-                     -> Result<&'a T, Box<dyn Error>> {
+fn get_or_err<'a, T>(field: Option<&'a T>, fieldname: &str) -> Result<&'a T, Box<dyn Error>> {
     match field {
         Some(val) => Ok(val),
         None => Err(format!("Field `{}` is empty, but is required", fieldname).into()),
     }
 }
-
