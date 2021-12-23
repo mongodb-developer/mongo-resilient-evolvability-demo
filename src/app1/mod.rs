@@ -22,16 +22,16 @@ pub struct BookPayload {
     pub explicit: Option<bool>,
 }
 
-// App1 main function to setup books REST API service
+// App1 main function to setup books manager REST API service
 //
 pub async fn app1_main(url: &str) -> Result<(), Box<dyn Error + Send + Sync>> {
     println!("App1 running against MongoDB database at '{}'", url);
-    let booksmgr = BooksMgr::new(url).await?;
-    let booksmgr_ref = warp::any().map(move || booksmgr.clone());
+    let books_mgr = BooksMgr::new(url).await?;
+    let books_mgr_ref = warp::any().map(move || books_mgr.clone());
     let api_path_filter_chain =
         warp::path(RSC_VERSION).and(warp::path(RSC_NAME)).and(warp::path::end());
     let api_path_json_capture_filter_chain =
-        api_path_filter_chain.and(capture_book_body_json()).and(booksmgr_ref.clone());
+        api_path_filter_chain.and(capture_book_body_json()).and(books_mgr_ref.clone());
     // CREATE: HTTP POST filter chain
     let add_items =
         warp::post().and(api_path_json_capture_filter_chain.clone()).and_then(insert_book_list);
@@ -39,7 +39,7 @@ pub async fn app1_main(url: &str) -> Result<(), Box<dyn Error + Send + Sync>> {
     let get_items = warp::get()
         .and(api_path_filter_chain)
         .and(capture_book_query_string())
-        .and(booksmgr_ref.clone())
+        .and(books_mgr_ref.clone())
         .and_then(get_books_list);
     // UPDATE: HTTP PUT filter chain
     let update_item =
@@ -77,9 +77,9 @@ fn capture_book_body_json(
 // Insert book record in back-end DB
 //
 async fn insert_book_list(
-    book_payload: BookPayload, booksmgr: BooksMgr,
+    book_payload: BookPayload, books_mgr: BooksMgr,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    match booksmgr.db_insert_book(&mut book_payload_to_book(&book_payload)).await {
+    match books_mgr.db_insert_book(&mut book_payload_to_book(&book_payload)).await {
         Ok(_) => Ok(warp::reply::with_status(
             "Inserted new book into the book list",
             http::StatusCode::CREATED,
@@ -94,9 +94,9 @@ async fn insert_book_list(
 // Update book record in back-end DB
 //
 async fn update_book_list(
-    book_payload: BookPayload, booksmgr: BooksMgr,
+    book_payload: BookPayload, books_mgr: BooksMgr,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    match booksmgr.db_update_book(&book_payload_to_book(&book_payload)).await {
+    match books_mgr.db_update_book(&book_payload_to_book(&book_payload)).await {
         Ok(_) => Ok(warp::reply::with_status(
             "Incremented book amount in the book list",
             http::StatusCode::CREATED,
@@ -111,9 +111,9 @@ async fn update_book_list(
 // Find all book records from back-end DB
 //
 async fn get_books_list(
-    book_payload: BookPayload, booksmgr: BooksMgr,
+    book_payload: BookPayload, books_mgr: BooksMgr,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    match booksmgr.db_find_books(&book_payload_to_book(&book_payload)).await {
+    match books_mgr.db_find_books(&book_payload_to_book(&book_payload)).await {
         Ok(result) => Ok(warp::reply::json(&books_to_books_payload(&result))),
         Err(e) => {
             eprintln!("Error deleting data: {}", e.to_string());
@@ -125,9 +125,9 @@ async fn get_books_list(
 // Delete specific book record from back-end DB
 //
 async fn delete_book_list(
-    book_payload: BookPayload, booksmgr: BooksMgr,
+    book_payload: BookPayload, books_mgr: BooksMgr,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    match booksmgr.db_delete_book(&book_payload_to_book(&book_payload)).await {
+    match books_mgr.db_delete_book(&book_payload_to_book(&book_payload)).await {
         Ok(_) => Ok(warp::reply::with_status("Removed book from books list", http::StatusCode::OK)),
         Err(e) => {
             eprintln!("Error deleting data: {}", e.to_string());

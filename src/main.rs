@@ -22,8 +22,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         APP2_ID => app2_main(&url).await?,
         _ => {
             eprintln!(
-                "\nERROR: Application id parameter must have the value '{}' or \
-                      '{}'\n",
+                "\nERROR: Application id parameter must have the value '{}' or '{}'\n",
                 APP1_ID, APP2_ID
             );
             exit(1);
@@ -40,16 +39,16 @@ fn get_appid_and_url_args_or_exit() -> (String, String) {
 
     if args.len() < 3 {
         eprintln!(
-            "\nERROR: An application id ('app1' or 'app2') + the MongoDB URL both need to \
-                   be provided as arguments\n"
+            "\nERROR: An application id ('app1' or 'app2') + the MongoDB URL both need to be \
+            provided as arguments\n"
         );
         exit(1);
     }
 
     if !args[2].starts_with("mongodb") {
         eprintln!(
-            "\nERROR: The second parameter (URL) must be a valid MongoDB URL starting with \
-                   the text 'mongodb'\n"
+            "\nERROR: The second parameter (URL) must be a valid MongoDB URL starting with the \
+            text 'mongodb'\n"
         );
         exit(1);
     }
